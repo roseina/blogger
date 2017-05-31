@@ -1,6 +1,6 @@
 class ArticlesController < ApplicationController
 	include ArticlesHelper
-	before_filter :require_login, only: [:new, :create, :show, :edit,:update, :destroy]
+	before_filter :require_login, only: [:new, :create, :edit,:update, :destroy]
 
 	def index
 		@articles= Article.all
@@ -22,12 +22,16 @@ class ArticlesController < ApplicationController
 
 	def show
 		@article = Article.find(params[:id])
-		respond_to do |format|
-			format.html
-			format.json {render json: @article}
+		if stale?(last_modified: @article.updated_at)
+			render json: @article
 		end
-		@comment = Comment.new
-		@comment.article_id = @article.id
+
+		# respond_to do |format|
+		# 	format.html
+		# 	format.json {render json: @article}
+		# end
+		# @comment = Comment.new
+		# @comment.article_id = @article.id
 
 
 	end
